@@ -3,7 +3,15 @@ import re
 import math
 
 CERITA_FOLDER = 'cerita'
+CUSTOM_FOLDER = 'custom'
 POSTS_PER_PAGE = 10
+
+def read_custom_file(filename):
+    path = os.path.join(CUSTOM_FOLDER, filename)
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return ''
 
 def extract_metadata(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
@@ -60,13 +68,25 @@ def generate_page(metadata_list, page_num, total_pages):
             page_file = 'index.html' if i == 1 else f'index{i}.html'
             nav_links.append(f'<a href="{page_file}">{i}</a>')
 
+    # Baca file custom
+    custom_head = read_custom_file('custom_head.html')
+    custom_js_head = read_custom_file('custom_js_head.html')  # Masih dalam <head>
+    custom_header = read_custom_file('custom_header.html')
+    custom_sidebar = read_custom_file('custom_sidebar.html')
+    custom_footer = read_custom_file('custom_footer.html')
+    custom_js_footer = read_custom_file('custom_js_footer.html')
+
     html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Daftar Cerita - Halaman {page_num}</title>
+    {custom_head}
+    {custom_js_head}
 </head>
 <body>
+    {custom_header}
+
     <h1>Daftar Cerita - Halaman {page_num}</h1>
     <ul>
         {''.join(list_items)}
@@ -74,6 +94,10 @@ def generate_page(metadata_list, page_num, total_pages):
     <div style="margin-top:20px;">
         Halaman: {' | '.join(nav_links)}
     </div>
+
+    {custom_sidebar}
+    {custom_footer}
+    {custom_js_footer}
 </body>
 </html>
     """
