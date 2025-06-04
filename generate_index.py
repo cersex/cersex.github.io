@@ -10,11 +10,19 @@ def extract_metadata(filepath):
         content = f.read()
 
     title_match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE | re.DOTALL)
+    h1_match = re.search(r'<h1.*?>(.*?)</h1>', content, re.IGNORECASE | re.DOTALL)
     category_match = re.search(r'<meta\s+name=["\']category["\']\s+content=["\'](.*?)["\']', content, re.IGNORECASE)
     date_match = re.search(r'<meta\s+name=["\']date["\']\s+content=["\'](.*?)["\']', content, re.IGNORECASE)
     image_match = re.search(r'<img[^>]+src=["\'](.*?)["\']', content, re.IGNORECASE)
 
-    title = title_match.group(1).strip() if title_match else os.path.basename(filepath)
+    if title_match and title_match.group(1).strip():
+        title = title_match.group(1).strip()
+    elif h1_match and h1_match.group(1).strip():
+        title = h1_match.group(1).strip()
+    else:
+        print(f"[Peringatan] Tidak ditemukan <title> atau <h1> di: {filepath}")
+        title = os.path.basename(filepath)
+
     category = category_match.group(1).strip() if category_match else "umum"
     date = date_match.group(1).strip() if date_match else "0000-00-00"
     thumbnail = image_match.group(1).strip() if image_match else ""
@@ -76,7 +84,10 @@ def generate_page(metadata_list, page_num, total_pages):
     print(f"{filename} berhasil dibuat.")
 
 def generate_index():
-    files = [f for f in os.listdir(CERITA_FOLDER) if f.endswith('.html')]
+    files = [
+        f for f in os.listdir(CERITA_FOLDER)
+        if f.endswith('.html') and not f.startswith('index')
+    ]
 
     metadata_list = []
     for filename in files:
