@@ -177,8 +177,8 @@ textarea:focus,
 }
 
 a {
-	color: #0073e5;
-	text-decoration: underline;
+	color: #49ace1;
+	text-decoration: none;
 	transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
@@ -584,7 +584,7 @@ th {
 .site-inner {
 	clear: both;
 	margin: 0 auto;
-	padding: 60px 0 0;
+	padding: 60px 20px 0;
 }
 
 
