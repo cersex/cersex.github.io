@@ -1593,8 +1593,8 @@ p.entry-meta {
 	--------------------------------------------- */
 
 	.sidebar {
-		float: right;
-		width: 30%;
+		float: none;
+		width: 100%;
 	}
 
 	.sidebar-content .sidebar {
@@ -1884,9 +1884,7 @@ p {
     margin: 0 auto !important;
 }
 
-.sidebar {
-    display: block !important;
-}
+
 
 .genesis-nav-menu a {
     padding-top: 10px;
