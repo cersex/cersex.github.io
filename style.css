@@ -1885,7 +1885,7 @@ p {
 }
 
 .sidebar {
-    display: none !important;
+    display: block !important;
 }
 
 .genesis-nav-menu a {
