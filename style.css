@@ -1846,3 +1846,50 @@ p.entry-meta {
 	}
 
 }
+
+
+
+/* === Custom Overrides for Max Width 800px === */
+
+.site-inner {
+    max-width: 800px !important;
+}
+
+body {
+    font-size: 17px;
+    line-height: 1.7;
+    padding: 0 15px;
+}
+
+h1 {
+    font-size: 26px;
+}
+
+h2 {
+    font-size: 22px;
+}
+
+h3 {
+    font-size: 20px;
+}
+
+p {
+    font-size: 17px;
+    margin-bottom: 24px;
+}
+
+.content {
+    width: 100% !important;
+    float: none !important;
+    margin: 0 auto !important;
+}
+
+.sidebar {
+    display: none !important;
+}
+
+.genesis-nav-menu a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 15px;
+}
