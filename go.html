@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safelink - Harap Tunggu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 50px 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #countdown {
+            font-size: 2.5em;
+            color: #e44d26;
+            margin-bottom: 20px;
+        }
+        #getLinkBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none; /* Sembunyikan tombol sampai countdown selesai */
+            text-decoration: none; /* Untuk kasus jika kita jadikan <a> */
+            display: inline-block; /* Agar bisa pakai margin auto jika perlu */
+        }
+        #getLinkBtn:hover {
+            background-color: #45a049;
+        }
+        .ad-space {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            min-height: 120px; /* Contoh tinggi minimum untuk iklan */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-style: italic;
+            font-size: 0.9em;
+            overflow: hidden; /* Penting untuk iklan */
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Harap Tunggu Sebentar...</h1>
+        <div class="ad-space">
+            <p>Tempat Iklan Anda (Ukuran 300x250 atau 320x50 direkomendasikan)</p>
+            </div>
+
+        <p>Link akan siap dalam: <span id="countdown">10</span> detik</p>
+        <a id="getLinkBtn" href="#">Dapatkan Link</a>
+    </div>
+
+    <script>
+        // Fungsi untuk men-decode URL dari Base64
+        function decodeUrl(encodedUrl) {
+            try {
+                return atob(encodedUrl); // atob() adalah fungsi bawaan JavaScript untuk Base64
+            } catch (e) {
+                console.error("Error decoding URL:", e);
+                return null;
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedUrl = urlParams.get('url'); // Ambil parameter 'url' dari URL
+        let countdownTime = 10; // Durasi hitungan mundur dalam detik (bisa diubah)
+
+        const countdownElement = document.getElementById('countdown');
+        const getLinkBtn = document.getElementById('getLinkBtn');
+
+        if (encodedUrl) {
+            const decodedUrl = decodeUrl(encodedUrl);
+
+            if (decodedUrl) {
+                // Mulai hitungan mundur
+                const countdownInterval = setInterval(() => {
+                    countdownTime--;
+                    countdownElement.textContent = countdownTime;
+                    if (countdownTime <= 0) {
+                        clearInterval(countdownInterval); // Hentikan hitungan mundur
+                        countdownElement.parentNode.style.display = 'none'; // Sembunyikan teks countdown
+                        getLinkBtn.style.display = 'block'; // Tampilkan tombol "Dapatkan Link"
+                        getLinkBtn.href = decodedUrl; // Set href tombol ke URL asli
+                        getLinkBtn.target = "_blank"; // Pastikan link terbuka di tab baru
+                    }
+                }, 1000); // Update setiap 1 detik
+            } else {
+                document.querySelector('.container').innerHTML = '<p class="error-message">Error: URL tidak dapat didekripsi atau tidak valid!</p>';
+            }
+        } else {
+            document.querySelector('.container').innerHTML = '<p class="error-message">Error: Tidak ada URL yang ditemukan dalam parameter!</p>';
+        }
+    </script>
+</body>
+</html>
