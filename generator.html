@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safelink Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="url"], input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #generatedLink {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            word-break: break-all;
+            display: none; /* Sembunyikan sampai link dibuat */
+        }
+        #generatedLink.show {
+            display: block;
+        }
+        #copyButton {
+            background-color: #28a745;
+            margin-left: 10px;
+        }
+        #copyButton:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Safelink URL Generator</h1>
+
+        <label for="originalUrl">URL Asli:</label>
+        <input type="url" id="originalUrl" placeholder="https://contoh.com/artikel-keren" required>
+
+        <label for="safelinkBaseUrlInput">Base URL Halaman Safelink Anda:</label>
+        <input type="text" id="safelinkBaseUrlInput" value="https://safelinkanda.com/go.html" placeholder="https://cersex.github.io/go.html" required>
+        <small>Pastikan ini mengarah ke file 'go.html' Anda.</small>
+        <br><br>
+
+        <button onclick="generateSafelink()">Generate Safelink</button>
+
+        <div id="generatedLink" class="">
+            <p>Safelink Anda:</p>
+            <input type="text" id="outputLink" readonly>
+            <button id="copyButton" onclick="copyToClipboard()">Copy</button>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk meng-encode URL ke Base64
+        function encodeUrl(url) {
+            return btoa(url); // btoa() adalah fungsi bawaan JavaScript untuk Base64
+        }
+
+        function generateSafelink() {
+            const originalUrl = document.getElementById('originalUrl').value;
+            const safelinkBaseUrl = document.getElementById('safelinkBaseUrlInput').value;
+            const outputLinkDiv = document.getElementById('generatedLink');
+            const outputLinkInput = document.getElementById('outputLink');
+
+            if (!originalUrl || !safelinkBaseUrl) {
+                alert("Harap masukkan kedua URL.");
+                return;
+            }
+
+            try {
+                // Validasi URL asli
+                new URL(originalUrl);
+                // Validasi URL safelink base
+                new URL(safelinkBaseUrl);
+
+                const encodedUrl = encodeUrl(originalUrl);
+                const fullSafelink = `${safelinkBaseUrl}?url=${encodedUrl}`;
+
+                outputLinkInput.value = fullSafelink;
+                outputLinkDiv.classList.add('show'); // Tampilkan div
+            } catch (e) {
+                alert("Format URL tidak valid. Pastikan URL asli dan Base URL Safelink benar (misal: https://example.com)");
+                console.error(e);
+                outputLinkDiv.classList.remove('show');
+            }
+        }
+
+        function copyToClipboard() {
+            const outputLinkInput = document.getElementById('outputLink');
+            outputLinkInput.select();
+            outputLinkInput.setSelectionRange(0, 99999); // Untuk perangkat mobile
+
+            try {
+                document.execCommand('copy');
+                alert('Safelink berhasil disalin!');
+            } catch (err) {
+                console.error('Gagal menyalin: ', err);
+                alert('Gagal menyalin link. Silakan salin manual.');
+            }
+        }
+    </script>
+</body>
+</html>
