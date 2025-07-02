@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x' # Bisa '3.9', '3.10', dll.
+          python-version: '3.x' # Atau versi spesifik seperti '3.9', '3.10', dll.
 
       - name: Install Python dependencies
         run: |
@@ -24,7 +24,9 @@ jobs:
           pip install requests markdown # Pastikan 'markdown' terinstal
 
       - name: Run Python script to generate HTML
-        run: python generate_blog.py # Nama file Python yang baru
+        # PENTING: Pastikan nama file Python Anda adalah 'generate_blog.py'
+        run: python generate_blog.py 
+        # Output dari skrip ini (folder 'docs' dengan index.html dan posts/) akan dibuat di sini
 
       - name: Deploy to GitHub Pages
         # Action ini akan secara otomatis melakukan git commit dan push dari direktori yang ditentukan
@@ -32,5 +34,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs # Ini HARUS sesuai dengan OUTPUT_DIR di skrip Python Anda
-          # Jika Anda ingin membersihkan file-file lama di GitHub Pages, tambahkan `keep_files: false`
+          # Untuk memastikan hanya file yang dihasilkan Python yang ada, bisa tambahkan:
           # keep_files: false
