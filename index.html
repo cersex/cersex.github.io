@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Saya dari WordPress.com (JavaScript)</title>
+    <title>Blog Saya dari WordPress.com</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: #f4f4f4; color: #333; }
         .container { max-width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -13,12 +13,51 @@
         .post-list { list-style: none; padding: 0; }
         .post-item { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         .post-item:last-child { border-bottom: none; }
-        .post-title { color: #007bff; text-decoration: none; }
+        .post-title { color: #007bff; text-decoration: none; cursor: pointer; } /* Tambah cursor: pointer */
         .post-title:hover { text-decoration: underline; }
         .post-meta { font-size: 0.9em; color: #777; margin-bottom: 10px; display: block; }
         .loading-message { text-align: center; color: #555; }
         footer { text-align: center; margin-top: 40px; font-size: 0.8em; color: #666; padding-top: 20px; border-top: 1px solid #eee; }
         img { max-width: 100%; height: auto; border-radius: 5px; }
+
+        /* Gaya untuk Modal Pop-up */
+        .modal {
+            display: none; /* Sembunyikan secara default */
+            position: fixed; /* Tetap di tempat yang sama saat menggulir */
+            z-index: 1; /* Di atas segalanya */
+            left: 0;
+            top: 0;
+            width: 100%; /* Lebar penuh */
+            height: 100%; /* Tinggi penuh */
+            overflow: auto; /* Aktifkan scroll jika konten terlalu panjang */
+            background-color: rgba(0,0,0,0.7); /* Latar belakang hitam transparan */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 10% dari atas dan terpusat secara horizontal */
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%; /* Bisa disesuaikan */
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -37,13 +76,27 @@
         </footer>
     </div>
 
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2 id="modalPostTitle"></h2>
+            <p class="post-meta" id="modalPostMeta"></p>
+            <div id="modalPostBody"></div>
+        </div>
+    </div>
+
     <script>
         const SITE_ID = "143986468"; // Ganti dengan Site ID WordPress.com Anda
         const API_BASE_URL = `https://public-api.wordpress.com/rest/v1.1/sites/${SITE_ID}/posts`;
         const postsContainer = document.getElementById('posts-container');
+        const postModal = document.getElementById('postModal');
+        const modalPostTitle = document.getElementById('modalPostTitle');
+        const modalPostMeta = document.getElementById('modalPostMeta');
+        const modalPostBody = document.getElementById('modalPostBody');
 
         async function fetchPosts() {
             try {
+                // Pastikan kita meminta 'content' (konten penuh) dari API
                 const response = await fetch(`${API_BASE_URL}?number=10&status=publish&fields=ID,title,content,date,slug,excerpt,featured_image`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -65,22 +118,24 @@
                     const postDate = new Date(post.date);
                     const formattedDate = postDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
-                    // Konten dari WP API seringkali HTML.
-                    // Untuk ringkasan, kita bisa gunakan excerpt atau potong kontennya.
-                    const excerpt = post.excerpt ? post.excerpt : (post.content.length > 200 ? post.content.substring(0, 200) + '...' : post.content);
+                    const snippet = post.excerpt ? post.excerpt : (post.content.length > 200 ? post.content.substring(0, 200) + '...' : post.content);
                     
-                    // Membuat URL dinamis untuk detail postingan (jika Anda ingin)
-                    // Untuk pendekatan ini, kita hanya menampilkan di index.html
-                    // Jika ingin halaman detail, butuh SPA routing atau halaman statis yang terpisah.
-                    // Untuk saat ini, kita akan tampilkan detail ringkas di index.html.
-
                     postElement.innerHTML = `
-                        <h3><a href="#" class="post-title">${post.title}</a></h3>
+                        <h3><a href="#" class="post-title" data-post='${JSON.stringify(post)}'>${post.title}</a></h3>
                         <span class="post-meta">Diterbitkan pada ${formattedDate}</span>
-                        <div class="post-excerpt">${excerpt}</div>
-                        <button onclick="showPostDetail('${encodeURIComponent(JSON.stringify(post))}')" class="read-more">Baca Selengkapnya &rarr;</button>
+                        <div class="post-excerpt">${snippet}</div>
+                        <button class="read-more" data-post='${JSON.stringify(post)}'>Baca Selengkapnya &rarr;</button>
                     `;
                     postsContainer.appendChild(postElement);
+                });
+
+                // Tambahkan event listener ke judul dan tombol "Baca Selengkapnya"
+                document.querySelectorAll('.post-title, .read-more').forEach(element => {
+                    element.addEventListener('click', function(event) {
+                        event.preventDefault(); // Mencegah link # bekerja
+                        const postData = JSON.parse(this.dataset.post);
+                        openModal(postData);
+                    });
                 });
 
             } catch (error) {
@@ -89,10 +144,23 @@
             }
         }
 
-        function showPostDetail(postJson) {
-            const post = JSON.parse(decodeURIComponent(postJson));
-            alert(`Judul: ${post.title}\n\nKonten:\n${post.content.replace(/<[^>]*>?/gm, '')} `); // Menghilangkan HTML tags dari konten
-            // Dalam aplikasi nyata, ini akan membuka modal atau halaman baru
+        function openModal(post) {
+            modalPostTitle.innerHTML = post.title;
+            const postDate = new Date(post.date);
+            modalPostMeta.innerHTML = `Diterbitkan pada ${postDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+            modalPostBody.innerHTML = post.content; // Tampilkan KONTEN PENUH di sini
+            postModal.style.display = "block";
+        }
+
+        function closeModal() {
+            postModal.style.display = "none";
+        }
+
+        // Tutup modal jika user mengklik di luar area konten modal
+        window.onclick = function(event) {
+            if (event.target == postModal) {
+                closeModal();
+            }
         }
 
         // Panggil fungsi saat halaman dimuat
