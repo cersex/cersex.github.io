@@ -1,84 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Daftar Cerita - Halaman 1</title>
-    
-<meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="stylesheet" href="/assets/custom.css"/>
-
-    
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Saya dari WordPress.com (JavaScript)</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        header { background-color: #333; color: #fff; padding: 15px 20px; border-radius: 8px 8px 0 0; text-align: center; margin-bottom: 20px; }
+        header h1 { margin: 0; }
+        header a { color: #fff; text-decoration: none; }
+        .post-list { list-style: none; padding: 0; }
+        .post-item { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .post-item:last-child { border-bottom: none; }
+        .post-title { color: #007bff; text-decoration: none; }
+        .post-title:hover { text-decoration: underline; }
+        .post-meta { font-size: 0.9em; color: #777; margin-bottom: 10px; display: block; }
+        .loading-message { text-align: center; color: #555; }
+        footer { text-align: center; margin-top: 40px; font-size: 0.8em; color: #666; padding-top: 20px; border-top: 1px solid #eee; }
+        img { max-width: 100%; height: auto; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    
-<!-- header wrapper start -->
-<div id='header-container'>
-<header id='header-wrapper'>
-<div class='header section' id='header'><div class='widget Header' data-version='1' id='Header1'>
-<div id='header-inner'>
-<div class='titlewrapper'>
-<h1 class='title'>
-Otong Sinaga
-</h1>
-<div class='descriptionwrapper'>
-<p class='description'><span>Tempat baca cerita seks.</span></p>
-</div>
-</div>
-</div>
-</div></div>
-<nav id='cssmenu'>
-<div id='head-mobile'></div>
-<div class='button' id='menu-button'></div>
-<!-- menu navigasi header start -->
-<ul>
-<li><a href='/search/label/sedarah'>Sedarah</a></li>
-<li><a href='/search/label/pembantu'>Pembantu</a></li>
-<li><a href='/search/label/janda'>Janda</a></li>
-<li><a href='/search/label/setengah-baya'>Setengah Baya</a></li>
-</ul>
-<!-- menu navigasi header end -->
-</nav>
-<div class='search-icon'>
-<a href='#searchfs'><span class='ion--search'></span></a>
-</div>
-<div id='searchfs'>
-<button class='close' type='button'>&#215;</button>
-<form action='/search' id='search-form' method='get'>
-<input name='q' placeholder='type to search' type='search' value=''/>
-<input name='max-results' type='hidden' value='7'/>
-</form>
-</div>
-<div class='clear'></div>
-</header>
-</div>
-<!-- header wrapper end -->
-
-
-
-    <h1>Daftar Cerita - Halaman 1</h1>
-    <ul>
-        
-<li style="overflow:auto;margin-bottom:20px;">
-  <a href="cerita/tes-artikel.html">
-    <img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjhVhXfHQT46_MCieY_RJFxxRTgjwYtQxW-QbbziokmRzzkBhJFYBH9f4b20LywfIo2igXNXYto0zoMBQ53Oea18eNKYYPiWIj2DVuREba-IyzGYFgvurec0iAJQaHVoYYD9geopPZD2KigwbcD_aBoDvV_d8fOBT4TFHms9OYWWqHYSxBqV496ix-GSA/s1024/cerita-seks-kakak-ipar.png' alt='Thumbnail' style='max-width:120px;margin-right:10px;float:left'>
-    <strong>Tes Artikel</strong>
-  </a><br>
-  <em>2024-12-01</em> — [Kategori: cerpen]
-</li>
-
-    </ul>
-    <div style="margin-top:20px;">
-        Halaman: <strong>1</strong>
+    <div class="container">
+        <header>
+            <h1><a href="/">Blog Saya Dinamis</a></h1>
+        </header>
+        <main>
+            <h2>Postingan Terbaru</h2>
+            <div id="posts-container" class="post-list">
+                <p class="loading-message">Memuat postingan...</p>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2025 Blog Saya. Dibuat dengan JavaScript.</p>
+        </footer>
     </div>
 
-    
+    <script>
+        const SITE_ID = "143986468"; // Ganti dengan Site ID WordPress.com Anda
+        const API_BASE_URL = `https://public-api.wordpress.com/rest/v1.1/sites/${SITE_ID}/posts`;
+        const postsContainer = document.getElementById('posts-container');
 
-    
+        async function fetchPosts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}?number=10&status=publish&fields=ID,title,content,date,slug,excerpt,featured_image`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                const posts = data.posts || [];
 
-    
+                if (posts.length === 0) {
+                    postsContainer.innerHTML = '<p class="loading-message">Tidak ada postingan yang ditemukan.</p>';
+                    return;
+                }
 
+                postsContainer.innerHTML = ''; // Hapus pesan loading
+
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post-item');
+
+                    const postDate = new Date(post.date);
+                    const formattedDate = postDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                    // Konten dari WP API seringkali HTML.
+                    // Untuk ringkasan, kita bisa gunakan excerpt atau potong kontennya.
+                    const excerpt = post.excerpt ? post.excerpt : (post.content.length > 200 ? post.content.substring(0, 200) + '...' : post.content);
+                    
+                    // Membuat URL dinamis untuk detail postingan (jika Anda ingin)
+                    // Untuk pendekatan ini, kita hanya menampilkan di index.html
+                    // Jika ingin halaman detail, butuh SPA routing atau halaman statis yang terpisah.
+                    // Untuk saat ini, kita akan tampilkan detail ringkas di index.html.
+
+                    postElement.innerHTML = `
+                        <h3><a href="#" class="post-title">${post.title}</a></h3>
+                        <span class="post-meta">Diterbitkan pada ${formattedDate}</span>
+                        <div class="post-excerpt">${excerpt}</div>
+                        <button onclick="showPostDetail('${encodeURIComponent(JSON.stringify(post))}')" class="read-more">Baca Selengkapnya &rarr;</button>
+                    `;
+                    postsContainer.appendChild(postElement);
+                });
+
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+                postsContainer.innerHTML = '<p class="loading-message">Gagal memuat postingan. Silakan coba lagi nanti.</p>';
+            }
+        }
+
+        function showPostDetail(postJson) {
+            const post = JSON.parse(decodeURIComponent(postJson));
+            alert(`Judul: ${post.title}\n\nKonten:\n${post.content.replace(/<[^>]*>?/gm, '')} `); // Menghilangkan HTML tags dari konten
+            // Dalam aplikasi nyata, ini akan membuka modal atau halaman baru
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchPosts);
+    </script>
 </body>
 </html>
-    
