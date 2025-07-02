@@ -239,7 +239,7 @@ def generate_index(posts):
 <main class="container">
     <div class="post-list">
         <div class="post-card">
-            <img class="post-image" src="{thumb}" alt="thumbnail">
+            <img class="post-image" src="/" alt="thumbnail">
             <div class="post-content">
                 <div class="post-meta">
                     {first_label_html}
