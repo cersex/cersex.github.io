@@ -1,17 +1,13 @@
-name: Fetch WordPress Posts and Deploy to GitHub Pages
+name: Generate Blog and Deploy to GitHub Pages
 
 on:
-  workflow_dispatch: # Memungkinkan Anda menjalankan workflow secara manual dari GitHub UI
+  workflow_dispatch: 
   schedule:
-    - cron: '0 0 * * *' # Jalankan setiap hari pada tengah malam UTC
+    - cron: '0 0 * * *' 
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
-    # --- PERUBAHAN DI SINI ---
-    # Bagian 'env' untuk WORDPRESS_SITE_ID dihapus karena sudah di hardcode di Python
-    # --- AKHIR PERUBAHAN ---
 
     steps:
       - name: Checkout repository
@@ -20,31 +16,33 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x' # Atau versi spesifik seperti '3.9'
+          python-version: '3.x' 
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests # Jika Anda menggunakan html2text, tambahkan juga di sini: pip install requests html2text
+          pip install requests markdown # Tambahkan 'markdown' di sini
 
-      - name: Fetch WordPress posts
-        run: python fetch_posts.py
-        # Output dari skrip Python Anda (misalnya, file JSON atau Markdown) akan dibuat di sini
+      - name: Run Python script to generate HTML
+        run: python fetch_and_generate.py # Pastikan ini nama file Python Anda
 
       - name: Configure Git for deployment
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit and push changes (if any)
+      - name: Commit and push changes
         run: |
-          git add .
-          git diff --quiet --exit-code || git commit -m "Update WordPress posts"
+          git add . # Pastikan ini menambahkan semua file HTML yang dihasilkan
+          git diff --quiet --exit-code || git commit -m "Update blog posts and pages"
           git push
 
-      - name: Deploy to GitHub Pages (opsional, jika Anda membuat file statis untuk Pages)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+      - name: Deploy to GitHub Pages
+        # Peaceiris action akan membantu membersihkan dan menerbitkan hanya direktori 'docs'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./content # Direktori yang berisi file postingan Anda
+          publish_dir: ./docs # Ini HARUS sesuai dengan OUTPUT_DIR di skrip Python Anda
+          # Jika Anda menggunakan branch 'main' sebagai sumber GitHub Pages dan filesnya di root,
+          # Anda mungkin tidak perlu action peaceiris ini, cukup langkah commit/push di atas.
+          # Tapi ini lebih rapi dan bisa membersihkan file lama.
