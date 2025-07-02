@@ -1,0 +1,48 @@
+name: Sync WordPress.com to GitHub Pages # Ubah nama workflow
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Setiap jam
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests # 'requests' masih diperlukan
+
+      - name: Fetch & Generate Blog
+        env:
+          # Perubahan di sini:
+          # Tidak perlu lagi BLOGGER_API_KEY
+          # Ganti BLOG_ID dengan ID numerik blog WordPress.com Anda
+          # Anda bisa hardcode di sini atau menggunakan GitHub Secret
+          WORDPRESS_BLOG_ID: ${{ secrets.WORDPRESS_BLOG_ID }} # <-- Sangat disarankan pakai Secret
+          # Atau jika tidak pakai Secret, langsung masukkan ID-nya:
+          # WORDPRESS_BLOG_ID: '143986468' # <-- Ganti dengan ID blog Anda
+        run: python your_wordpress_fetch_script.py # <-- Ganti nama file Python Anda
+
+      - name: Commit & Push changes
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          if git diff --cached --quiet; then
+            echo "✅ Tidak ada perubahan"
+          else
+            git commit -m "🔄 Update artikel otomatis dari WordPress.com" # Ubah pesan commit
+            git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
+          fi
