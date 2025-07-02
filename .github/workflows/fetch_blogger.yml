@@ -45,4 +45,4 @@ jobs:
           else
             git commit -m "🔄 Update artikel otomatis dari WordPress.com" # Ubah pesan commit
             git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
-          fi
+          fi 
