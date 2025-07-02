@@ -9,9 +9,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    env:
-      # Pastikan WORDPRESS_SITE_ID disimpan sebagai GitHub Secret di repositori Anda
-      WORDPRESS_SITE_ID: ${{ secrets.WORDPRESS_SITE_ID }} 
+    # --- PERUBAHAN DI SINI ---
+    # Bagian 'env' untuk WORDPRESS_SITE_ID dihapus karena sudah di hardcode di Python
+    # --- AKHIR PERUBAHAN ---
 
     steps:
       - name: Checkout repository
@@ -43,14 +43,8 @@ jobs:
           git push
 
       - name: Deploy to GitHub Pages (opsional, jika Anda membuat file statis untuk Pages)
-        # Jika Anda menggunakan Static Site Generator seperti Jekyll/Hugo/Gatsby di sini,
-        # langkah ini akan berbeda dan mungkin menggunakan action seperti peaceiris/actions-gh-pages.
-        # Untuk demo ini, kita hanya memastikan file yang dihasilkan oleh Python tersedia.
-        # GitHub Pages akan otomatis melayani konten dari branch yang Anda konfigurasi (misalnya `main` atau `gh-pages`).
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./content # Direktori yang berisi file postingan atau output SSG Anda
-          # Untuk Jekyll/Hugo, ini bisa menjadi '_site' atau 'public'
-          # Jika Anda hanya ingin file JSON/MD di root repo, cukup hapus publish_dir
+          publish_dir: ./content # Direktori yang berisi file postingan Anda
