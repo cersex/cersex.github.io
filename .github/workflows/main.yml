@@ -1,14 +1,14 @@
 name: Generate Blog and Deploy to GitHub Pages
 
 on:
-  workflow_dispatch: 
-  schedule:
-    - cron: '0 0 * * *' 
+  push:
+    branches:
+      - main # Workflow akan berjalan setiap kali ada push ke branch 'main'
+  workflow_dispatch: # Memungkinkan Anda menjalankan workflow secara manual
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -16,33 +16,21 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x' 
+          python-version: '3.x' # Bisa '3.9', '3.10', dll.
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests markdown # Tambahkan 'markdown' di sini
+          pip install requests markdown # Pastikan 'markdown' terinstal
 
       - name: Run Python script to generate HTML
-        run: python fetch_and_generate.py # Pastikan ini nama file Python Anda
-
-      - name: Configure Git for deployment
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit and push changes
-        run: |
-          git add . # Pastikan ini menambahkan semua file HTML yang dihasilkan
-          git diff --quiet --exit-code || git commit -m "Update blog posts and pages"
-          git push
+        run: python generate_blog.py # Nama file Python yang baru
 
       - name: Deploy to GitHub Pages
-        # Peaceiris action akan membantu membersihkan dan menerbitkan hanya direktori 'docs'
+        # Action ini akan secara otomatis melakukan git commit dan push dari direktori yang ditentukan
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs # Ini HARUS sesuai dengan OUTPUT_DIR di skrip Python Anda
-          # Jika Anda menggunakan branch 'main' sebagai sumber GitHub Pages dan filesnya di root,
-          # Anda mungkin tidak perlu action peaceiris ini, cukup langkah commit/push di atas.
-          # Tapi ini lebih rapi dan bisa membersihkan file lama.
+          # Jika Anda ingin membersihkan file-file lama di GitHub Pages, tambahkan `keep_files: false`
+          # keep_files: false
