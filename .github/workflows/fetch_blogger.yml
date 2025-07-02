@@ -28,7 +28,7 @@ jobs:
           # Tidak perlu lagi BLOGGER_API_KEY
           # Ganti BLOG_ID dengan ID numerik blog WordPress.com Anda
           # Anda bisa hardcode di sini atau menggunakan GitHub Secret
-          WORDPRESS_BLOG_ID: ${{ secrets.WORDPRESS_BLOG_ID }} # <-- Sangat disarankan pakai Secret
+          WORDPRESS_BLOG_ID: '143986468' # <-- Sangat disarankan pakai Secret
           # Atau jika tidak pakai Secret, langsung masukkan ID-nya:
           # WORDPRESS_BLOG_ID: '143986468' # <-- Ganti dengan ID blog Anda
         run: python fetch_blogger.py # <-- Ganti nama file Python Anda
