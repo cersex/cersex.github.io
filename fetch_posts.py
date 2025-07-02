@@ -2,13 +2,11 @@ import requests
 import os
 import json
 
-# Pastikan Anda telah mendapatkan SITE_ID dari WordPress.com Anda
-# Anda bisa menyimpannya sebagai environment variable atau langsung di sini
-# Contoh: SITE_ID = "123456789"
-SITE_ID = os.getenv("143986468")
-if not SITE_ID:
-    print("Error: WORDPRESS_SITE_ID environment variable not set.")
-    exit(1)
+# --- PERUBAHAN DI SINI ---
+# Untuk percobaan, Site ID langsung dimasukkan ke dalam variabel.
+# Harap diingat, untuk produksi, sangat disarankan menggunakan GitHub Secrets.
+SITE_ID = "143986468" # <--- Site ID Anda langsung di sini!
+# --- AKHIR PERUBAHAN ---
 
 API_BASE_URL = f"https://public-api.wordpress.com/rest/v1.1/sites/{SITE_ID}/posts"
 
@@ -34,14 +32,12 @@ def fetch_wordpress_posts(num_posts=5):
         
         processed_posts = []
         for post in posts:
-            # Anda bisa memproses konten di sini, misalnya membersihkan HTML, dll.
-            # Untuk contoh ini, kita hanya akan menyimpan judul, slug, dan sebagian konten.
             processed_posts.append({
                 'id': post['ID'],
                 'title': post['title'],
                 'slug': post['slug'],
                 'date': post['date'],
-                'content': post['content'] # Ini mungkin perlu dibersihkan untuk Markdown
+                'content': post['content'] # Ini masih HTML, idealnya diubah ke Markdown
             })
         
         return processed_posts
