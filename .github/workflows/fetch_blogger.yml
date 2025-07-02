@@ -31,7 +31,7 @@ jobs:
           WORDPRESS_BLOG_ID: ${{ secrets.WORDPRESS_BLOG_ID }} # <-- Sangat disarankan pakai Secret
           # Atau jika tidak pakai Secret, langsung masukkan ID-nya:
           # WORDPRESS_BLOG_ID: '143986468' # <-- Ganti dengan ID blog Anda
-        run: python your_wordpress_fetch_script.py # <-- Ganti nama file Python Anda
+        run: python fetch_blogger.py # <-- Ganti nama file Python Anda
 
       - name: Commit & Push changes
         env:
